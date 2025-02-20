@@ -37,8 +37,7 @@ export default function Home() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-4">Adopt a Puppy</h1>
+    <>
       <FilterControls
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -53,6 +52,6 @@ export default function Home() {
           // Might be cache-control: no-cache?
           data.map((puppy) => <PuppyCard key={puppy._id} puppy={puppy} />)}
       </div>
-    </div>
+    </>
   );
 }

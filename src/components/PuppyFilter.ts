@@ -29,3 +29,15 @@ export async function fetchPuppies(
 
   return response.json();
 }
+
+export async function fetchPuppy(id: string): Promise<Puppy> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${id}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch puppy");
+  }
+
+  return response.json();
+}
