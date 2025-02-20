@@ -1,4 +1,5 @@
 "use client";
+import AdoptPuppyForm from "@/components/AdoptPuppyForm";
 import FallbackImage from "@/components/FallbackImage";
 import { fetchPuppy } from "@/components/PuppyFilter";
 import { useQuery } from "@tanstack/react-query";
@@ -65,6 +66,7 @@ export default function PuppyPage() {
           {puppy.isNeutered ? "Neutered" : "Not Neutered"}
         </span>
       </div>
+      <AdoptPuppyForm puppy={puppy} />
     </div>
   );
 }
