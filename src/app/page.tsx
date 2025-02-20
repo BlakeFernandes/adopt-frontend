@@ -1,52 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import FallbackImage from "./FallbackImage";
+import FilterControls from "@/components/FilterControls";
+import { PuppyCard } from "@/components/PuppyCard";
+import { fetchPuppies, Filters } from "@/components/PuppyFilter";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useDebounce } from "use-debounce";
 
-type Puppy = {
+export type Puppy = {
+  _id: string;
   name: string;
   breed: string;
   age: number;
+  gender: string;
+  size: string;
+  isVaccinated: boolean;
+  isNeutered: boolean;
   photoUrl: string;
   traits: string[];
 };
 
 export default function Home() {
-  const [data, setData] = useState<Puppy[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // debounce da puppies so we no spam backend
+  const [filters, setFilters] = useState<Filters>({
+    breed: "",
+    age: "",
+    size: "",
+    gender: "",
+  });
 
-  useEffect(() => {
-    fetch("http://localhost:3000/puppies")
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  if (!data) return <p>Loading...</p>;
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["puppies", debouncedSearchQuery, filters],
+    queryFn: () => fetchPuppies(debouncedSearchQuery, filters),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-semibold mb-4">Adopt a Puppy</h1>
+      <FilterControls
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filters={filters}
+        setFilters={setFilters}
+      />
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {data.map((puppy) => (
-          <div
-            key={puppy.name} // change to something better for vDom
-            className="flex flex-col items-center text-center p-4 rounded-lg"
-          >
-            <div className="w-48 h-48 overflow-hidden rounded-full">
-              <FallbackImage
-                src={puppy.photoUrl}
-                alt={puppy.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <h2 className="text-lg font-semibold mt-5">{puppy.name}</h2>
-            <p className="text-sm font-semibold uppercase mt-1">
-              {puppy.breed}
-            </p>
-            <p className="text-gray-500 text-sm mt-3">{puppy.age} years old</p>
-            <p className="text-gray-500 text-sm">{puppy.traits.join(", ")}</p>
-          </div>
-        ))}
+        {isError && <p>Something went wrong...</p>}
+        {isLoading && <p>Loading...</p>}
+        {Array.isArray(data) &&
+          // Check why we're re-fetching images on every render
+          // Might be cache-control: no-cache?
+          data.map((puppy) => <PuppyCard key={puppy._id} puppy={puppy} />)}
       </div>
     </div>
   );
