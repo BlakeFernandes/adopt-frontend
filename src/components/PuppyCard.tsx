@@ -1,8 +1,7 @@
 import { PuppyWithId } from "@/app/page";
-import React from "react";
 import FallbackImage from "./FallbackImage";
 
-export const PuppyCard = React.memo(({ puppy }: { puppy: PuppyWithId }) => {
+export const PuppyCard = ({ puppy }: { puppy: PuppyWithId }) => {
   return (
     <a
       className="flex flex-col items-center text-center p-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out"
@@ -21,6 +20,6 @@ export const PuppyCard = React.memo(({ puppy }: { puppy: PuppyWithId }) => {
       <p className="text-gray-500 text-sm">{puppy.traits.join(", ")}</p>
     </a>
   );
-});
+};
 
 PuppyCard.displayName = "PuppyCard";
