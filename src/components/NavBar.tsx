@@ -8,6 +8,9 @@ export default function NavBar() {
         <Link href="/" className="text-blue-500 hover:underline">
           Home
         </Link>
+        <Link href="/admin" className="text-blue-500 hover:underline">
+          Admin
+        </Link>
       </div>
     </nav>
   );

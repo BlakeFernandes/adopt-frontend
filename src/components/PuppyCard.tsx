@@ -6,7 +6,7 @@ export const PuppyCard = React.memo(({ puppy }: { puppy: Puppy }) => {
   return (
     <a
       className="flex flex-col items-center text-center p-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out"
-      href={`/${puppy._id}`}
+      href={`/puppies/${puppy._id}`}
     >
       <div className="w-48 h-48 overflow-hidden rounded-full">
         <FallbackImage

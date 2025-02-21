@@ -41,3 +41,53 @@ export async function fetchPuppy(id: string): Promise<Puppy> {
 
   return response.json();
 }
+
+export async function addPuppy(puppy: Puppy) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(puppy),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to add puppy");
+  }
+  return response.json();
+}
+
+export async function updatePuppy(puppy: Puppy) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${puppy._id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(puppy),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update puppy");
+  }
+  return response.json();
+}
+
+export async function deletePuppy(puppyId: string) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${puppyId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete puppy");
+  }
+  return response.json();
+}

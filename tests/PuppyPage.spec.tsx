@@ -1,4 +1,4 @@
-import PuppyPage from "@/app/[slug]/page";
+import PuppyPage from "@/app/puppies/[slug]/page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
