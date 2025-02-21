@@ -1,8 +1,8 @@
-import { Puppy } from "@/app/page";
+import { PuppyWithId } from "@/app/page";
 import React from "react";
 import FallbackImage from "./FallbackImage";
 
-export const PuppyCard = React.memo(({ puppy }: { puppy: Puppy }) => {
+export const PuppyCard = React.memo(({ puppy }: { puppy: PuppyWithId }) => {
   return (
     <a
       className="flex flex-col items-center text-center p-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out"

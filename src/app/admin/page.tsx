@@ -1,6 +1,6 @@
 "use client";
 
-import { Puppy } from "@/app/page";
+import { Puppy, PuppyWithId } from "@/app/page";
 import FallbackImage from "@/components/FallbackImage";
 import FilterControls from "@/components/FilterControls";
 import {
@@ -19,9 +19,7 @@ import { useDebounce } from "use-debounce";
 
 export default function AdminPuppyManagement() {
   const queryClient = useQueryClient();
-  const [selectedPuppy, setSelectedPuppy] = useState<Partial<Puppy> | null>(
-    null
-  );
+  const [selectedPuppy, setSelectedPuppy] = useState<Puppy | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
@@ -44,7 +42,7 @@ export default function AdminPuppyManagement() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (puppy: Puppy) => updatePuppy(puppy),
+    mutationFn: (puppy: PuppyWithId) => updatePuppy(puppy),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["puppies"] }),
   });
 
@@ -53,9 +51,9 @@ export default function AdminPuppyManagement() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["puppies"] }),
   });
 
-  const handleSave = (puppy: Puppy) => {
+  const handleSave = (puppy: Puppy & { _id?: string }) => {
     if (puppy._id) {
-      updateMutation.mutate(puppy);
+      updateMutation.mutate(puppy as PuppyWithId);
     } else {
       addMutation.mutate(puppy);
     }
@@ -78,17 +76,18 @@ export default function AdminPuppyManagement() {
       />
       <Button
         onClick={() => {
-          setSelectedPuppy({
-            name: "",
-            age: 0,
-            gender: "",
-            isVaccinated: false,
-            isNeutered: false,
-            size: "",
-            breed: "",
-            traits: [],
-            photoUrl: "",
-          });
+          // setSelectedPuppy({
+          //   name: "",
+          //   age: 0,
+          //   gender: "",
+          //   isVaccinated: false,
+          //   isNeutered: false,
+          //   size: "",
+          //   breed: "",
+          //   traits: [],
+          //   photoUrl: "",
+          // });
+          setSelectedPuppy(null);
           setIsDialogOpen(true);
         }}
         variant={"outline"}

@@ -9,3 +9,5 @@
 8. Migrate Partial<Puppy> in PuppyForm to something a bit more stable over long-term
 9. Hook up backend errors to form on PuppyForm
 10. Add tests for Admin page
+11. Toast or something similar to display status of PuppyForm submission
+12. Clean up admin/form code

@@ -35,8 +35,8 @@ export default function PuppyForm({
   puppy,
   onSave,
 }: {
-  puppy: Partial<Puppy>;
-  onSave: (puppy: Partial<Puppy>) => void;
+  puppy: Puppy | null;
+  onSave: (puppy: Puppy & { _id?: string }) => void;
 }) {
   const {
     register,
@@ -47,15 +47,15 @@ export default function PuppyForm({
   } = useForm<PuppyFormValues>({
     resolver: zodResolver(puppySchema),
     defaultValues: {
-      name: puppy.name || "",
-      age: puppy.age || 0,
-      gender: puppy.gender || "",
-      isVaccinated: puppy.isVaccinated || false,
-      isNeutered: puppy.isNeutered || false,
-      size: puppy.size || "",
-      breed: puppy.breed || "",
-      traits: puppy.traits || [],
-      photoUrl: puppy.photoUrl || "",
+      name: puppy?.name || "",
+      age: puppy?.age || 0,
+      gender: puppy?.gender || "",
+      isVaccinated: puppy?.isVaccinated || false,
+      isNeutered: puppy?.isNeutered || false,
+      size: puppy?.size || "",
+      breed: puppy?.breed || "",
+      traits: puppy?.traits || [],
+      photoUrl: puppy?.photoUrl || "",
     },
   });
 

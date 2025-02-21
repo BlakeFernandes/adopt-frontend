@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useDebounce } from "use-debounce";
 
 export type Puppy = {
-  _id: string;
   name: string;
   breed: string;
   age: number;
@@ -19,6 +18,8 @@ export type Puppy = {
   photoUrl: string;
   traits: string[];
 };
+
+export type PuppyWithId = Puppy & { _id: string };
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
