@@ -3,38 +3,20 @@
 import { Puppy, PuppyWithId } from "@/app/page";
 import FallbackImage from "@/components/FallbackImage";
 import FilterControls from "@/components/FilterControls";
-import {
-  addPuppy,
-  deletePuppy,
-  fetchPuppies,
-  Filters,
-  updatePuppy,
-} from "@/components/PuppyFilter";
+import { addPuppy, deletePuppy, updatePuppy } from "@/components/PuppyFilter";
 import PuppyForm from "@/components/PuppyForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import usePuppySearch from "@/hooks/usePuppySearch";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useDebounce } from "use-debounce";
 
 export default function AdminPuppyManagement() {
   const queryClient = useQueryClient();
   const [selectedPuppy, setSelectedPuppy] = useState<Puppy | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [filters, setFilters] = useState<Filters>({
-    breed: "",
-    age: "",
-    size: "",
-    gender: "",
-  });
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["puppies", debouncedSearchQuery, filters],
-    queryFn: () => fetchPuppies(debouncedSearchQuery, filters),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  const { search, filter, query } = usePuppySearch();
 
   const addMutation = useMutation({
     mutationFn: (puppy: Puppy) => addPuppy(puppy),
@@ -64,29 +46,19 @@ export default function AdminPuppyManagement() {
     deleteMutation.mutate(puppyId);
   };
 
-  if (isError) return <p>Error loading puppies.</p>;
+  if (query.isError) return <p>Error loading puppies.</p>;
 
   return (
     <div className="test">
       <FilterControls
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filters={filters}
-        setFilters={setFilters}
+        searchQuery={search.query}
+        setSearchQuery={search.setQuery}
+        filters={filter.values}
+        setFilters={filter.setValues}
       />
+
       <Button
         onClick={() => {
-          // setSelectedPuppy({
-          //   name: "",
-          //   age: 0,
-          //   gender: "",
-          //   isVaccinated: false,
-          //   isNeutered: false,
-          //   size: "",
-          //   breed: "",
-          //   traits: [],
-          //   photoUrl: "",
-          // });
           setSelectedPuppy(null);
           setIsDialogOpen(true);
         }}
@@ -94,6 +66,7 @@ export default function AdminPuppyManagement() {
       >
         Add Puppy
       </Button>
+
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
@@ -105,14 +78,14 @@ export default function AdminPuppyManagement() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {query.isLoading ? (
               <tr>
                 <td colSpan={4} className="text-center p-4">
                   Loading...
                 </td>
               </tr>
             ) : (
-              data?.map((puppy) => (
+              query.data?.map((puppy) => (
                 <tr key={puppy._id} className="border-t">
                   <td className="px-4 py-2 border items-center">
                     <div className="flex gap-2">
