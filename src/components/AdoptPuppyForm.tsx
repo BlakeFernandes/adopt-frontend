@@ -1,7 +1,7 @@
-import { Puppy } from "@/app/page";
+import { PuppyWithId } from "@/app/page";
 import { useState } from "react";
 
-export default function AdoptPuppyForm({ puppy }: { puppy: Puppy }) {
+export default function AdoptPuppyForm({ puppy }: { puppy: PuppyWithId }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",

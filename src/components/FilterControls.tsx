@@ -2,6 +2,7 @@
 
 import { toTitleCase } from "@/utils/utils";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 type FilterControlsProps = {
   searchQuery: string;
@@ -49,7 +50,7 @@ export default function FilterControls({
     { value: "8", label: "8 Years" },
     { value: "9", label: "9 Years" },
     { value: "10", label: "10 Years" },
-  ]
+  ];
 
   const sizeOptions = [
     { value: "Small", label: "Small" },
@@ -124,6 +125,15 @@ export default function FilterControls({
           </option>
         ))}
       </select>
+
+      <Button
+        onClick={() => {
+          setFilters({ breed: "", age: "", size: "", gender: "" });
+          setSearchQuery("");
+        }}
+      >
+        Reset
+      </Button>
     </div>
   );
 }

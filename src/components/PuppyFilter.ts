@@ -1,4 +1,4 @@
-import { Puppy } from "@/app/page";
+import { Puppy, PuppyWithId } from "@/app/page";
 
 export type Filters = {
   gender: string;
@@ -10,7 +10,7 @@ export type Filters = {
 export async function fetchPuppies(
   searchQuery: string,
   filters: Filters
-): Promise<Puppy[]> {
+): Promise<PuppyWithId[]> {
   const queryParams = new URLSearchParams();
 
   if (searchQuery) queryParams.append("search", searchQuery);
@@ -30,7 +30,7 @@ export async function fetchPuppies(
   return response.json();
 }
 
-export async function fetchPuppy(id: string): Promise<Puppy> {
+export async function fetchPuppy(id: string): Promise<PuppyWithId> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${id}`
   );
@@ -39,5 +39,55 @@ export async function fetchPuppy(id: string): Promise<Puppy> {
     throw new Error("Failed to fetch puppy");
   }
 
+  return response.json();
+}
+
+export async function addPuppy(puppy: Puppy) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(puppy),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to add puppy");
+  }
+  return response.json();
+}
+
+export async function updatePuppy(puppy: PuppyWithId) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${puppy._id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(puppy),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update puppy");
+  }
+  return response.json();
+}
+
+export async function deletePuppy(puppyId: string) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies/${puppyId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete puppy");
+  }
   return response.json();
 }

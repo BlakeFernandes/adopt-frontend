@@ -2,13 +2,9 @@
 
 import FilterControls from "@/components/FilterControls";
 import { PuppyCard } from "@/components/PuppyCard";
-import { fetchPuppies, Filters } from "@/components/PuppyFilter";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { useDebounce } from "use-debounce";
+import usePuppySearch from "@/hooks/usePuppySearch";
 
 export type Puppy = {
-  _id: string;
   name: string;
   breed: string;
   age: number;
@@ -20,37 +16,28 @@ export type Puppy = {
   traits: string[];
 };
 
-export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // debounce da puppies so we no spam backend
-  const [filters, setFilters] = useState<Filters>({
-    breed: "",
-    age: "",
-    size: "",
-    gender: "",
-  });
+export type PuppyWithId = Puppy & { _id: string };
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["puppies", debouncedSearchQuery, filters],
-    queryFn: () => fetchPuppies(debouncedSearchQuery, filters),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+export default function Home() {
+  const { search, filter, query } = usePuppySearch();
 
   return (
     <>
       <FilterControls
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filters={filters}
-        setFilters={setFilters}
+        searchQuery={search.query}
+        setSearchQuery={search.setQuery}
+        filters={filter.values}
+        setFilters={filter.setValues}
       />
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {isError && <p>Something went wrong...</p>}
-        {isLoading && <p>Loading...</p>}
-        {Array.isArray(data) &&
+        {query.isError && <p>Something went wrong...</p>}
+        {query.isLoading && <p>Loading...</p>}
+        {Array.isArray(query.data) &&
           // Check why we're re-fetching images on every render
           // Might be cache-control: no-cache?
-          data.map((puppy) => <PuppyCard key={puppy._id} puppy={puppy} />)}
+          query.data.map((puppy) => (
+            <PuppyCard key={puppy._id} puppy={puppy} />
+          ))}
       </div>
     </>
   );
