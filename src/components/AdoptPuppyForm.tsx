@@ -18,7 +18,7 @@ export default function AdoptPuppyForm({ puppy }: { puppy: PuppyWithId }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/adopt/${puppy._id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/adopters/${puppy._id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
