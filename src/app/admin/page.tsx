@@ -1,17 +1,18 @@
 "use client";
 
-import { Puppy, PuppyWithId } from "@/app/page";
+import PuppyForm from "@/components/CreatePuppyForm";
 import FilterControls from "@/components/FilterControls";
-import PuppyForm from "@/components/PuppyForm";
+import PuppyPagination from "@/components/PuppyPagination";
 import PuppyTable from "@/components/PuppyTable";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import usePuppyMutation from "@/hooks/usePuppyMutation";
 import usePuppySearch from "@/hooks/usePuppySearch";
+import { Puppy, PuppyWithId } from "@/lib/types";
 import { useState } from "react";
 
 export default function AdminPuppyManagement() {
-  const { search, filter, query } = usePuppySearch();
+  const { search, filter, page, query } = usePuppySearch();
   // made this a hook exposing var mutation to avoid mistake imports
   const { mutation } = usePuppyMutation();
 
@@ -50,7 +51,7 @@ export default function AdminPuppyManagement() {
       </Button>
 
       <PuppyTable
-        puppies={query.data || []}
+        puppies={query.data?.puppies || []}
         isLoading={query.isLoading}
         onEdit={(puppy) => {
           setSelectedPuppy(puppy);
@@ -58,6 +59,8 @@ export default function AdminPuppyManagement() {
         }}
         onDelete={handleDelete}
       />
+
+      <PuppyPagination page={page} lastPage={query.data?.lastPage ?? 0} />
 
       {isDialogOpen && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

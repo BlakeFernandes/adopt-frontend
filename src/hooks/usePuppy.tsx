@@ -1,4 +1,4 @@
-import { fetchPuppy } from "@/components/PuppyFilter";
+import { fetchPuppy } from "@/lib/PuppyFilter";
 import { useQuery } from "@tanstack/react-query";
 
 export default function usePuppy(id: string) {
@@ -7,5 +7,6 @@ export default function usePuppy(id: string) {
     queryFn: () => fetchPuppy(id),
     staleTime: 1000 * 60 * 5, // 5 minutes
     enabled: !!id, // ensures the query doesn't run until id is available
+    retry: 3,
   });
 }

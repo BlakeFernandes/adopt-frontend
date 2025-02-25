@@ -7,7 +7,12 @@ import { Button } from "./ui/button";
 type FilterControlsProps = {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  filters: { breed: string; age: string; size: string; gender: string };
+  filters: {
+    breed: string;
+    age: string;
+    size: string;
+    gender: string;
+  };
   setFilters: (filters: {
     breed: string;
     age: string;
@@ -131,6 +136,8 @@ export default function FilterControls({
           setFilters({ breed: "", age: "", size: "", gender: "" });
           setSearchQuery("");
         }}
+        size={"lg"}
+        className="my-auto"
       >
         Reset
       </Button>
