@@ -1,29 +1,76 @@
-import { PuppyWithId } from "@/app/page";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { PuppyWithId } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+const adoptSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().min(1, "Phone is required"),
+  message: z.string().min(10, "Message needs to be at least 10 characters"),
+});
+
+type AdoptFormValues = z.infer<typeof adoptSchema>;
 
 export default function AdoptPuppyForm({ puppy }: { puppy: PuppyWithId }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<AdoptFormValues>({
+    resolver: zodResolver(adoptSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/adopters/${puppy._id}`, {
+  const onSubmit = async (data: AdoptFormValues) => {
+    setLoading(true);
+
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/adopters`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    setSubmitted(true);
+      body: JSON.stringify({
+        puppyId: puppy._id,
+        ...data,
+      }),
+    })
+      .then(async (res) => {
+        const responseData = await res.json();
+
+        if (!res.ok) {
+          setError("root", {
+            type: "custom",
+            message: responseData.message.join(", "),
+          });
+          return;
+        }
+
+        setSubmitted(true);
+      })
+      .catch((error) => {
+        console.error(error);
+        setError("root", {
+          type: "custom",
+          message: "An unexpected error occurred. Please try again.",
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -36,48 +83,61 @@ export default function AdoptPuppyForm({ puppy }: { puppy: PuppyWithId }) {
           Your adoption request has been submitted!
         </p>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="Your Name"
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="Your Email"
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            type="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            placeholder="Your Phone Number"
-            required
-            className="border p-2 rounded"
-          />
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleInputChange}
-            placeholder="Why do you want to adopt?"
-            required
-            className="border p-2 rounded"
-          ></textarea>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          >
-            Submit Request
-          </button>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" placeholder="Your Name" {...register("name")} />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Your Email"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              placeholder="Your Phone Number"
+              {...register("phone")}
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="message">Message</Label>
+            <textarea
+              id="message"
+              placeholder="Why do you want to adopt?"
+              {...register("message")}
+              className="border p-2 rounded w-full"
+            ></textarea>
+            {errors.message && (
+              <p className="text-red-500 text-sm">{errors.message.message}</p>
+            )}
+          </div>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Submitting..." : "Submit Request"}
+          </Button>
+
+          {/* Display custom errors from the server */}
+          {errors.root && errors.root.type === "custom" && (
+            <p className="text-red-500 text-sm">{errors.root.message}</p>
+          )}
         </form>
       )}
     </div>

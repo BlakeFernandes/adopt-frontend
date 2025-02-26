@@ -1,4 +1,4 @@
-import { Puppy, PuppyWithId } from "@/app/page";
+import { Puppy, PuppyWithId } from "@/lib/types";
 import FallbackImage from "./FallbackImage";
 
 interface PuppyTableProps {

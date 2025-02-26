@@ -1,4 +1,4 @@
-import { PuppyWithId } from "@/app/page";
+import { PuppyWithId } from "@/lib/types";
 import FallbackImage from "./FallbackImage";
 
 export const PuppyCard = ({ puppy }: { puppy: PuppyWithId }) => {

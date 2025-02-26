@@ -1,18 +1,19 @@
 "use client";
 
-import { Puppy, PuppyWithId } from "@/app/page";
+import PuppyForm from "@/components/CreatePuppyForm";
 import FilterControls from "@/components/FilterControls";
-import PuppyForm from "@/components/PuppyForm";
+import PuppyPagination from "@/components/PuppyPagination";
 import PuppyTable from "@/components/PuppyTable";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { usePageNumber } from "@/hooks/usePageNumber";
 import usePuppyMutation from "@/hooks/usePuppyMutation";
 import usePuppySearch from "@/hooks/usePuppySearch";
-import { useState } from "react";
+import { FetchAllPuppies, Puppy, PuppyWithId } from "@/lib/types";
+import { Suspense, useState } from "react";
 
 export default function AdminPuppyManagement() {
   const { search, filter, query } = usePuppySearch();
-  // made this a hook exposing var mutation to avoid mistake imports
   const { mutation } = usePuppyMutation();
 
   const [selectedPuppy, setSelectedPuppy] = useState<Puppy | null>(null);
@@ -28,10 +29,12 @@ export default function AdminPuppyManagement() {
     mutation.delete.mutate(puppyId);
   };
 
-  if (query.isError) return <p>Error loading puppies.</p>;
+  if (query.isError) {
+    return <p>Error loading puppies.</p>;
+  }
 
   return (
-    <div className="test">
+    <>
       <FilterControls
         searchQuery={search.query}
         setSearchQuery={search.setQuery}
@@ -49,15 +52,16 @@ export default function AdminPuppyManagement() {
         Add Puppy
       </Button>
 
-      <PuppyTable
-        puppies={query.data || []}
-        isLoading={query.isLoading}
-        onEdit={(puppy) => {
-          setSelectedPuppy(puppy);
-          setIsDialogOpen(true);
-        }}
-        onDelete={handleDelete}
-      />
+      <Suspense fallback={<p>Loading...</p>}>
+        <AdminPuppyTable
+          query={query}
+          onEdit={(puppy) => {
+            setSelectedPuppy(puppy);
+            setIsDialogOpen(true);
+          }}
+          onDelete={handleDelete}
+        />
+      </Suspense>
 
       {isDialogOpen && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -69,6 +73,39 @@ export default function AdminPuppyManagement() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
+  );
+}
+
+function AdminPuppyTable({
+  query,
+  onEdit,
+  onDelete,
+}: {
+  query: {
+    data: FetchAllPuppies | undefined;
+    isLoading: boolean;
+    isError: boolean;
+  };
+  onEdit: (puppy: Puppy) => void;
+  onDelete: (puppyId: string) => void;
+}) {
+  const { page, setPage } = usePageNumber();
+
+  return (
+    <>
+      <PuppyTable
+        puppies={query.data?.puppies || []}
+        isLoading={query.isLoading}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+
+      <PuppyPagination
+        page={page}
+        setPage={setPage}
+        lastPage={query.data?.lastPage ?? 0}
+      />
+    </>
   );
 }
