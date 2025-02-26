@@ -1,16 +1,10 @@
-import { Puppy, PuppyWithId } from "@/app/page";
-
-export type Filters = {
-  gender: string;
-  size: string;
-  age: string;
-  breed: string;
-};
+import { FetchAllPuppies, Filters, Puppy, PuppyWithId } from "./types";
 
 export async function fetchPuppies(
   searchQuery: string,
-  filters: Filters
-): Promise<PuppyWithId[]> {
+  filters: Filters,
+  page: number
+): Promise<FetchAllPuppies> {
   const queryParams = new URLSearchParams();
 
   if (searchQuery) queryParams.append("search", searchQuery);
@@ -18,6 +12,7 @@ export async function fetchPuppies(
   if (filters.age) queryParams.append("age", filters.age);
   if (filters.size) queryParams.append("size", filters.size);
   if (filters.gender) queryParams.append("gender", filters.gender);
+  if (page) queryParams.append("page", page.toString());
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/puppies?${queryParams.toString()}`

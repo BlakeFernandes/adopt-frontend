@@ -4,24 +4,38 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
-const mockPuppies = [
-  {
-    _id: "1",
-    name: "Buddy",
-    breed: "Golden Retriever",
-    age: 2,
-    photoUrl: "https://example.com/buddy.jpg",
-    traits: ["Friendly", "Playful"],
-  },
-  {
-    _id: "2",
-    name: "Luna",
-    breed: "Labrador Retriever",
-    age: 3,
-    photoUrl: "https://example.com/luna.jpg",
-    traits: ["Loyal", "Energetic"],
-  },
-];
+const mockPuppies = {
+  puppies: [
+    {
+      _id: "1",
+      name: "Buddy",
+      breed: "Golden Retriever",
+      age: 2,
+      photoUrl: "https://example.com/buddy.jpg",
+      traits: ["Friendly", "Playful"],
+    },
+    {
+      _id: "2",
+      name: "Luna",
+      breed: "Labrador Retriever",
+      age: 3,
+      photoUrl: "https://example.com/luna.jpg",
+      traits: ["Loyal", "Energetic"],
+    },
+  ],
+  lastPage: 1,
+};
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/",
+}));
 
 const server = setupServer(
   http.get(`http://localhost:3000/puppies`, () => {
@@ -44,6 +58,7 @@ describe("Puppy Home Page", () => {
       </QueryClientProvider>
     );
 
+    // Wait for the puppies to load
     await waitFor(() => expect(screen.getByText("Buddy")).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText("Luna")).toBeInTheDocument());
 

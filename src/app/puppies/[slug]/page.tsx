@@ -4,17 +4,19 @@ import FallbackImage from "@/components/FallbackImage";
 import usePuppy from "@/hooks/usePuppy";
 import { useParams } from "next/navigation";
 
-// might be better to pass the puppy object, and then query for more details
-// to prevent the user from seeing the loading state
 export default function PuppyPage() {
   const params = useParams();
   const id = params?.slug;
 
   const { data: puppy, isLoading, isError } = usePuppy(id as string);
 
-  if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (!puppy || isError)
+  if (isLoading) {
+    return <p className="text-center text-gray-500">Loading...</p>;
+  }
+
+  if (!puppy || isError) {
     return <p className="text-center text-red-500">Puppy not found.</p>;
+  }
 
   return (
     <div className="flex flex-col items-center p-6 pt-24 space-y-4">

@@ -1,5 +1,6 @@
 "use client";
 
+import { Filters } from "@/lib/types";
 import { toTitleCase } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -7,13 +8,8 @@ import { Button } from "./ui/button";
 type FilterControlsProps = {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  filters: { breed: string; age: string; size: string; gender: string };
-  setFilters: (filters: {
-    breed: string;
-    age: string;
-    size: string;
-    gender: string;
-  }) => void;
+  filters: Filters;
+  setFilters: (filters: Filters) => void;
 };
 
 export type FilterOptions = {
@@ -131,6 +127,8 @@ export default function FilterControls({
           setFilters({ breed: "", age: "", size: "", gender: "" });
           setSearchQuery("");
         }}
+        size={"lg"}
+        className="my-auto"
       >
         Reset
       </Button>
